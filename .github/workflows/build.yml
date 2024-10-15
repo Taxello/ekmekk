@@ -12,7 +12,8 @@ jobs:
       - name: Update package list and install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libtinfo5
+          sudo apt-get install -y libtinfo6
+
       
       # APK derleme adımı
       - name: Build APK
