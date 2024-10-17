@@ -7,7 +7,7 @@ title = Ekmek Sayaci
 package.name = ekmeksayaci
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.mustafaa
+package.domain = org.mustafa
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,datetime,requests,pyrebase,pillow,urllib3,idna,charset-normalizer,chardet,oauth2client,httplib2,pyparsing
+requirements = python3,kivy,datetime,requests,pyrebase,pillow
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -95,7 +95,7 @@ android.presplash_color = #FFFFFF
 
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
-android.permissions = android.permission.INTERNET
+android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
@@ -117,7 +117,6 @@ android.permissions = android.permission.INTERNET
 
 # (bool) Use --private data storage (True) or --dir public storage (False)
 #android.private_storage = True
-
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
 #android.ndk_path =
@@ -178,7 +177,7 @@ android.accept_sdk_license = True
 
 # (list) List of Java files to add to the android project (can be java or a
 # directory containing the files)
-android.add_src = .
+#android.add_src =
 
 # (list) Android AAR archives to add
 #android.add_aars =
