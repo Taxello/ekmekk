@@ -26,20 +26,20 @@ def islem_kaydet(kullanici, islem_turu, miktar):
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
 
-# Tüm işlemleri getirme fonksiyonu
+# Tüm işlemleri al
 def tum_islemleri_getir():
     try:
         url = f"{config['databaseURL']}islemler.json"  # .json uzantısı ile URL
         response = requests.get(url)  # GET isteği ile işlemleri al
         if response.status_code == 200:
             islemler = response.json()
-            return islemler if islemler else []
+            return islemler if islemler else {}
         else:
             print(f"İşlemler alınamadı, hata: {response.status_code}")
-            return []
+            return {}
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
-        return []
+        return {}
 
 # Yeni kullanıcı ekleme fonksiyonu
 def add_user(user_id, user_data):
