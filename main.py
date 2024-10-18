@@ -435,10 +435,11 @@ class TumIslemlerEkrani(Screen):
 
         # Tüm işlemleri ekrana yazdırma kısmı
         islemler = veri.tum_islemleri_getir()
-        for islem_id, islem_verisi in islemler.items():  # her islem için islem_id ve islem_verisi al
-            label = Label(text=f"{islem_verisi['tarih']}: {islem_verisi['kullanici']} - {islem_verisi['islem_turu']} - {islem_verisi['miktari']}",
-                          size_hint_y=None, height=40)
-            layout.add_widget(label)
+        if islemler != None:
+            for islem_id, islem_verisi in islemler.items():  # her islem için islem_id ve islem_verisi al
+                label = Label(text=f"{islem_verisi['tarih']}: {islem_verisi['kullanici']} - {islem_verisi['islem_turu']} - {islem_verisi['miktari']}",
+                              size_hint_y=None, height=40)
+                layout.add_widget(label)
 
         # Layout'u ScrollView'a ekle
         scroll_view.add_widget(layout)
