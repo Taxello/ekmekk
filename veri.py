@@ -60,7 +60,7 @@ def generate_user_id():
         response = requests.get(url)
         if response.status_code == 200:
             users = response.json()
-            if users:
+            if isinstance(users, dict):  # Kullanıcı verisi sözlükse
                 return str(len(users) + 1)  # Mevcut kullanıcı sayısına 1 ekleyin
             return "1"  # Eğer hiç kullanıcı yoksa ID'yi "1" olarak belirleyin
         else:
@@ -92,10 +92,17 @@ def dogrulama(isim, sifre):
                 dogrumu = False
                 return False
 
-            for user_id, user_data in users.items():
-                if user_data.get('name') == isim and user_data.get('password') == sifre:
-                    dogrumu = True  # Doğru giriş
-                    return True
+            if isinstance(users, dict):  # Kullanıcı verisi sözlükse
+                for user_id, user_data in users.items():
+                    if user_data.get('name') == isim and user_data.get('password') == sifre:
+                        dogrumu = True  # Doğru giriş
+                        return True
+            else:  # Eğer liste ise
+                for user_data in users:
+                    if user_data.get('name') == isim and user_data.get('password') == sifre:
+                        dogrumu = True  # Doğru giriş
+                        return True
+
             dogrumu = False
             return False
         else:
