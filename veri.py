@@ -79,18 +79,25 @@ def kullanici_ekle(isim, sifre):
     add_user(user_data)
 
 def dogrulama(isim, sifre):
+    global dogrumu
     try:
         users = tum_kullanicilari_getir()  # Kullanıcı verilerini al
         if not users:  # Eğer kullanıcı yoksa
+            dogrumu = False
             return False
+    
 
         for user_id, user_data in users.items():
             if user_data and user_data.get('name') == isim:
                 if user_data.get('password') == sifre:
+                    dogrumu = True
                     return True  # Doğru giriş
+                    
+        dogrumu = False
         return False  # Hatalı giriş
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
+        dogrumu = False
         return False
 
 # Sayaç oluşturma
