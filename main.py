@@ -433,10 +433,9 @@ class TumIslemlerEkrani(Screen):
         layout = BoxLayout(orientation='vertical', size_hint_y=None)
         layout.bind(minimum_height=layout.setter('height'))
 
-        # Tüm işlemleri al
+        # Tüm işlemleri ekrana yazdırma kısmı
         islemler = veri.tum_islemleri_getir()
-        for islem in islemler:
-            islem_verisi = islem.val()
+        for islem_id, islem_verisi in islemler.items():  # her islem için islem_id ve islem_verisi al
             label = Label(text=f"{islem_verisi['tarih']}: {islem_verisi['kullanici']} - {islem_verisi['islem_turu']} - {islem_verisi['miktari']}",
                           size_hint_y=None, height=40)
             layout.add_widget(label)
