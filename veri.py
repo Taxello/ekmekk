@@ -1,5 +1,9 @@
 import requests
+import ssl
 from datetime import datetime
+
+# SSL sertifika doğrulamasını devre dışı bırakmak için
+ssl._create_default_https_context = ssl._create_unverified_context
 
 # Firebase yapılandırma bilgileri
 config = {
@@ -115,7 +119,7 @@ def dogrulama(isim, sifre):
 # Sayaç oluşturma
 def initialize_counter():
     try:
-        url = f"{config['databaseURL']}sayaç.json"
+        url = f"{config['databaseURL']}sayac.json"
         response = requests.put(url, json=0)  # Sayaç değerini 0 olarak başlat
         if response.status_code == 200:
             print("Sayaç başarıyla oluşturuldu.")
@@ -127,7 +131,7 @@ def initialize_counter():
 # Sayaç değerini alma
 def get_counter_value():
     try:
-        url = f"{config['databaseURL']}sayaç.json"
+        url = f"{config['databaseURL']}sayac.json"
         response = requests.get(url)  # GET isteği ile sayaç değerini al
         if response.status_code == 200:
             return response.json()  # Sayaç değerini döndür
@@ -144,7 +148,7 @@ def increment_counter(amount):
         current_value = get_counter_value()
         if current_value is not None:
             new_value = current_value + amount
-            url = f"{config['databaseURL']}sayaç.json"
+            url = f"{config['databaseURL']}sayac.json"
             response = requests.put(url, json=new_value)  # Sayaç değerini güncelle
             if response.status_code == 200:
                 print(f"Sayaç güncellendi: {new_value}")
@@ -159,8 +163,8 @@ def decrement_counter(amount):
         current_value = get_counter_value()
         if current_value is not None:
             new_value = current_value - amount
-            url = f"{config['databaseURL']}sayaç.json"
-            response = requests.put(url, json=new_value)  # Sayaç değerini güncelle
+            url = f"{config['databaseURL']}sayac.json"
+            response = requests.put(url, json=new_value)  #  değerini güncelle
             if response.status_code == 200:
                 print(f"Sayaç güncellendi: {new_value}")
             else:
