@@ -104,7 +104,7 @@ def dogrulama(isim, sifre):
 def initialize_counter():
     try:
         # "sayaç" adında bir düğüm oluştur ve değerini 0 olarak ayarla
-        response = requests.put(f"{BASE_URL}/sayaç.json", json=0)
+        response = requests.put(f"{BASE_URL}/sayac.json", json=0)
         response.raise_for_status()
         print("Sayaç başarıyla oluşturuldu.")
     except Exception as e:
@@ -113,7 +113,7 @@ def initialize_counter():
 # Sayaç değerini al
 def get_counter_value():
     try:
-        response = requests.get(f"{BASE_URL}/sayaç.json")
+        response = requests.get(f"{BASE_URL}/sayac.json")
         response.raise_for_status()
         return response.json()
     except Exception as e:
@@ -126,7 +126,7 @@ def increment_counter(amount):
         current_value = get_counter_value()
         if current_value is not None:
             new_value = current_value + amount
-            requests.put(f"{BASE_URL}/sayaç.json", json=new_value)
+            requests.put(f"{BASE_URL}/sayac.json", json=new_value)
             print(f"Sayaç güncellendi: {new_value}")
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
@@ -137,7 +137,7 @@ def decrement_counter(amount):
         current_value = get_counter_value()
         if current_value is not None:
             new_value = current_value - amount
-            requests.put(f"{BASE_URL}/sayaç.json", json=new_value)
+            requests.put(f"{BASE_URL}/sayac.json", json=new_value)
             print(f"Sayaç güncellendi: {new_value}")
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
