@@ -1,117 +1,94 @@
 import requests
-import ssl
 from datetime import datetime
+import ssl
 
 # SSL sertifika doğrulamasını devre dışı bırakmak için
 ssl._create_default_https_context = ssl._create_unverified_context
 
-# Firebase yapılandırma bilgileri
+
+# Firebase yapılandırma bilgilerini burada girin
 config = {
-    "databaseURL": "https://ekmek-sayaci-default-rtdb.firebaseio.com/"
+    "apiKey": "apiii",
+    "authDomain": "ekmek-sayaci.firebaseapp.com",
+    "databaseURL": "https://ekmek-sayaci-default-rtdb.firebaseio.com/",
+    "projectId": "ekmek-sayaci",
+    "storageBucket": "ekmek-sayaci.appspot.com",
+    "messagingSenderId": "762075188413",
+    "appId": "1:762075188413:android:6b783fdffdac4031557bd4"
 }
+
+BASE_URL = config['databaseURL']
 
 dogrumu = None
 
 # İşlem kaydetme fonksiyonu
 def islem_kaydet(kullanici, islem_turu, miktar):
     try:
+        # İşlem verisini oluştur
         islem_verisi = {
             "kullanici": kullanici,
             "islem_turu": islem_turu,
             "miktari": miktar,
             "tarih": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-        url = f"{config['databaseURL']}islemler.json"  # .json uzantısı kullan
-        response = requests.post(url, json=islem_verisi)  # Veriyi JSON olarak POST isteği ile gönder
-        if response.status_code == 200:
-            print("İşlem başarıyla kaydedildi:", islem_verisi)
-        else:
-            print(f"İşlem kaydedilemedi, hata: {response.status_code}")
+        # İşlemi Firebase'e ekle
+        response = requests.post(f"{BASE_URL}/islemler.json", json=islem_verisi)
+        response.raise_for_status()
+        print("İşlem başarıyla kaydedildi:", islem_verisi)
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
 
-# Tüm işlemleri al
+# Tüm işlemleri çekme fonksiyonu
 def tum_islemleri_getir():
     try:
-        url = f"{config['databaseURL']}islemler.json"  # .json uzantısı ile URL
-        response = requests.get(url)  # GET isteği ile işlemleri al
-        if response.status_code == 200:
-            islemler = response.json()
-            return islemler if islemler else {}
-        else:
-            print(f"İşlemler alınamadı, hata: {response.status_code}")
-            return {}
+        response = requests.get(f"{BASE_URL}/islemler.json")
+        response.raise_for_status()
+        islemler = response.json()
+        return islemler
+    except Exception as e:
+        print(f"Bir hata oluştu: {e}")
+        return []
+
+def add_user(user_data):
+    try:
+        # Kullanıcı verisini Firebase'e ekle
+        response = requests.post(f"{BASE_URL}/users.json", json=user_data)
+        response.raise_for_status()
+        user_id = response.json()['name']  # Firebase, eklenen verinin anahtarını döner
+        print("Kullanıcı başarıyla eklendi:", user_id, user_data)
+    except requests.exceptions.JSONDecodeError as e:
+        print(f"JSON Çözümleme Hatası: {e}")
+    except Exception as e:
+        print(f"Bir hata oluştu: {e}")
+
+def tum_kullanicilari_getir():
+    try:
+        response = requests.get(f"{BASE_URL}/users.json")
+        response.raise_for_status()
+        return response.json()
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
         return {}
 
-# Yeni kullanıcı ekleme fonksiyonu
-def add_user(user_id, user_data):
-    try:
-        url = f"{config['databaseURL']}users/{user_id}.json"  # Kullanıcı ID'si ile .json uzantılı URL
-        response = requests.put(url, json=user_data)  # Veriyi JSON formatında PUT isteği ile gönder
-        if response.status_code == 200:
-            print("Kullanıcı başarıyla eklendi:", user_data)
-        else:
-            print(f"Kullanıcı eklenemedi, hata: {response.status_code}")
-    except Exception as e:
-        print(f"Bir hata oluştu: {e}")
-
-# Kullanıcı ID oluşturma fonksiyonu
-def generate_user_id():
-    try:
-        url = f"{config['databaseURL']}users.json"
-        response = requests.get(url)
-        if response.status_code == 200:
-            users = response.json()
-            if isinstance(users, dict):  # Kullanıcı verisi sözlükse
-                return str(len(users) + 1)  # Mevcut kullanıcı sayısına 1 ekleyin
-            return "1"  # Eğer hiç kullanıcı yoksa ID'yi "1" olarak belirleyin
-        else:
-            print(f"Kullanıcı ID'si oluşturulamadı, hata: {response.status_code}")
-            return None
-    except Exception as e:
-        print(f"Bir hata oluştu: {e}")
-        return None
-
-# Kullanıcı ekleme
 def kullanici_ekle(isim, sifre):
-    user_id = generate_user_id()  # Yeni kullanıcı ID'sini oluştur
-    if user_id:
-        user_data = {
-            "name": isim,
-            "password": sifre
-        }
-        add_user(user_id, user_data)
+    user_data = {
+        "name": isim,
+        "password": sifre
+    }
+    # Kullanıcıyı ekle
+    add_user(user_data)
 
-# Kullanıcı doğrulama
 def dogrulama(isim, sifre):
-    global dogrumu
     try:
-        url = f"{config['databaseURL']}users.json"
-        response = requests.get(url)
-        if response.status_code == 200:
-            users = response.json()
-            if not users:
-                dogrumu = False
-                return False
-
-            if isinstance(users, dict):  # Kullanıcı verisi sözlükse
-                for user_id, user_data in users.items():
-                    if user_data.get('name') == isim and user_data.get('password') == sifre:
-                        dogrumu = True  # Doğru giriş
-                        return True
-            else:  # Eğer liste ise
-                for user_data in users:
-                    if user_data.get('name') == isim and user_data.get('password') == sifre:
-                        dogrumu = True  # Doğru giriş
-                        return True
-
-            dogrumu = False
+        users = tum_kullanicilari_getir()  # Kullanıcı verilerini al
+        if not users:  # Eğer kullanıcı yoksa
             return False
-        else:
-            print(f"Kullanıcı doğrulaması yapılamadı, hata: {response.status_code}")
-            return False
+
+        for user_id, user_data in users.items():
+            if user_data and user_data.get('name') == isim:
+                if user_data.get('password') == sifre:
+                    return True  # Doğru giriş
+        return False  # Hatalı giriş
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
         return False
@@ -119,25 +96,19 @@ def dogrulama(isim, sifre):
 # Sayaç oluşturma
 def initialize_counter():
     try:
-        url = f"{config['databaseURL']}sayac.json"
-        response = requests.put(url, json=0)  # Sayaç değerini 0 olarak başlat
-        if response.status_code == 200:
-            print("Sayaç başarıyla oluşturuldu.")
-        else:
-            print(f"Sayaç oluşturulamadı, hata: {response.status_code}")
+        # "sayaç" adında bir düğüm oluştur ve değerini 0 olarak ayarla
+        response = requests.put(f"{BASE_URL}/sayaç.json", json=0)
+        response.raise_for_status()
+        print("Sayaç başarıyla oluşturuldu.")
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
 
-# Sayaç değerini alma
+# Sayaç değerini al
 def get_counter_value():
     try:
-        url = f"{config['databaseURL']}sayac.json"
-        response = requests.get(url)  # GET isteği ile sayaç değerini al
-        if response.status_code == 200:
-            return response.json()  # Sayaç değerini döndür
-        else:
-            print(f"Sayaç alınamadı, hata: {response.status_code}")
-            return None
+        response = requests.get(f"{BASE_URL}/sayaç.json")
+        response.raise_for_status()
+        return response.json()
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
         return None
@@ -148,12 +119,8 @@ def increment_counter(amount):
         current_value = get_counter_value()
         if current_value is not None:
             new_value = current_value + amount
-            url = f"{config['databaseURL']}sayac.json"
-            response = requests.put(url, json=new_value)  # Sayaç değerini güncelle
-            if response.status_code == 200:
-                print(f"Sayaç güncellendi: {new_value}")
-            else:
-                print(f"Sayaç güncellenemedi, hata: {response.status_code}")
+            requests.put(f"{BASE_URL}/sayaç.json", json=new_value)
+            print(f"Sayaç güncellendi: {new_value}")
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
 
@@ -163,11 +130,7 @@ def decrement_counter(amount):
         current_value = get_counter_value()
         if current_value is not None:
             new_value = current_value - amount
-            url = f"{config['databaseURL']}sayac.json"
-            response = requests.put(url, json=new_value)  #  değerini güncelle
-            if response.status_code == 200:
-                print(f"Sayaç güncellendi: {new_value}")
-            else:
-                print(f"Sayaç güncellenemedi, hata: {response.status_code}")
+            requests.put(f"{BASE_URL}/sayaç.json", json=new_value)
+            print(f"Sayaç güncellendi: {new_value}")
     except Exception as e:
         print(f"Bir hata oluştu: {e}")
