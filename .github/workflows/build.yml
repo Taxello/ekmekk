@@ -9,41 +9,61 @@ jobs:
     runs-on: macos-latest  # macOS ortamı gerekli
     steps:
       - uses: actions/checkout@v4
-      
+        name: Checkout code
+        run: echo "Code checked out from repository."
+
       - name: Install autoconf and other dependencies
         run: |
-          brew reinstall pkg-config  # pkg-config'ı yeniden yükle
+          echo "Installing dependencies..."
+          brew install pkg-config || brew reinstall pkg-config
           brew install autoconf automake libtool
+          echo "Dependencies installed."
 
       - name: Set up Python environment
-        run: python3 -m venv venv  # Sanal ortam oluştur
-      
+        run: |
+          echo "Setting up Python virtual environment..."
+          python3 -m venv venv  # Sanal ortam oluştur
+          echo "Python virtual environment created."
+
       - name: Activate virtual environment and install dependencies
         run: |
+          echo "Activating virtual environment..."
           source venv/bin/activate
+          echo "Upgrading pip..."
           pip install --upgrade pip
+          echo "Installing project dependencies..."
           pip install setuptools  # distutils için gerekli
           pip install kivy buildozer cython
           pip install pbxproj  # pbxproj modülünü yükle
+          echo "All dependencies installed."
 
       - name: Clean buildozer
         run: |
+          echo "Cleaning previous build artifacts..."
           source venv/bin/activate
           buildozer ios clean  # iOS uygulaması için temizleme
+          echo "Clean complete."
 
       - name: Build iOS App
         run: |
+          echo "Building iOS app..."
           source venv/bin/activate  # Sanal ortamı etkinleştir
           buildozer -v ios debug  # iOS uygulamasını derle
+          echo "iOS app build process completed."
+
+          echo "Displaying build logs..."
+          tail -n 50 .buildozer/ios/debug/*.log  # Son 50 satırı göster
 
       - name: Check for .ipa file
         run: |
-          if [ -f ./bin/*.ipa ]; then
+          echo "Checking for .ipa file..."
+          if find ./bin -name "*.ipa" | grep -q .; then
             echo ".ipa file found."
           else
             echo "No .ipa file found."
             exit 1  # Hata durumunda işlemi durdur
           fi
+
 
       - name: Upload iOS IPA package
         uses: actions/upload-artifact@v4
