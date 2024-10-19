@@ -1,28 +1,31 @@
+name: Build iOS App
+
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  build-ios:
     runs-on: macos-latest  # macOS ortamı gerekli
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install dependencies for iOS
+      
+      - name: Set up Python environment
+        run: python3 -m venv venv  # Sanal ortam oluştur
+      
+      - name: Activate virtual environment and install dependencies
         run: |
-          brew install python3
-          sudo pip3 install --upgrade pip
-          sudo pip3 install kivy buildozer cython
-        
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install kivy buildozer cython
+          
       - name: Build iOS App
-        uses: digreatbrian/buildozer-action@v2
-        with:
-          buildozer-cmd: buildozer -v ios debug
-          work-dir: . 
-
-      - name: Upload artifacts
+        run: |
+          source venv/bin/activate  # Sanal ortamı etkinleştir
+          buildozer -v ios debug  # iOS uygulamasını derle
+          
+      - name: Upload iOS IPA package
         uses: actions/upload-artifact@v4
         with:
           name: ios-package
-          path: ./bin/*.ipa  # iOS dosyası
-
+          path: ./bin/*.ipa
