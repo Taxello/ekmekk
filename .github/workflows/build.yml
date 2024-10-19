@@ -16,7 +16,10 @@ jobs:
       - name: Build APK
         uses: digreatbrian/buildozer-action@v2
         with:
-          buildozer-cmd: buildozer -v android debug
+        
+          #buildozer-cmd: buildozer -v android debug
+          buildozer-cmd: buildozer -v ios debug
+          
           work-dir: . 
 
       - name: Upload artifacts
