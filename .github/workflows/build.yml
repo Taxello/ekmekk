@@ -4,26 +4,25 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: macos-latest  # macOS ortamı gerekli
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Update package list and install dependencies
+
+      - name: Install dependencies for iOS
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libtinfo5
-          
-      - name: Build APK
+          brew install python3
+          sudo pip3 install --upgrade pip
+          sudo pip3 install kivy buildozer cython
+        
+      - name: Build iOS App
         uses: digreatbrian/buildozer-action@v2
         with:
-        
-          #buildozer-cmd: buildozer -v android debug
           buildozer-cmd: buildozer -v ios debug
-          
           work-dir: . 
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: package
-          path: ./bin/*.apk
+          name: ios-package
+          path: ./bin/*.ipa  # iOS dosyası
+
