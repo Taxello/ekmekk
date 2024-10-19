@@ -17,6 +17,7 @@ jobs:
         run: |
           source venv/bin/activate
           pip install --upgrade pip
+          pip install setuptools  # distutils için gerekli
           pip install kivy buildozer cython
           
       - name: Build iOS App
