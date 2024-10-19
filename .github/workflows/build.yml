@@ -24,12 +24,26 @@ jobs:
           pip install setuptools  # distutils için gerekli
           pip install kivy buildozer cython
           pip install pbxproj  # pbxproj modülünü yükle
-          
+
+      - name: Clean buildozer
+        run: |
+          source venv/bin/activate
+          buildozer ios clean  # iOS uygulaması için temizleme
+
       - name: Build iOS App
         run: |
           source venv/bin/activate  # Sanal ortamı etkinleştir
           buildozer -v ios debug  # iOS uygulamasını derle
-          
+
+      - name: Check for .ipa file
+        run: |
+          if [ -f ./bin/*.ipa ]; then
+            echo ".ipa file found."
+          else
+            echo "No .ipa file found."
+            exit 1  # Hata durumunda işlemi durdur
+          fi
+
       - name: Upload iOS IPA package
         uses: actions/upload-artifact@v4
         with:
