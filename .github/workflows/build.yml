@@ -23,6 +23,7 @@ jobs:
           pip install --upgrade pip
           pip install setuptools  # distutils için gerekli
           pip install kivy buildozer cython
+          pip install pbxproj  # pbxproj modülünü yükle
           
       - name: Build iOS App
         run: |
