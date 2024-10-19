@@ -36,9 +36,6 @@ jobs:
           source venv/bin/activate  # Sanal ortamı etkinleştir
           buildozer -v ios debug  # iOS uygulamasını derle
 
-          echo "Displaying build logs..."
-          tail -n 50 .buildozer/ios/debug/*.log  # Son 50 satırı göster
-
       - name: Check for .ipa file
         run: |
           if [ -f ./bin/*.ipa ]; then
